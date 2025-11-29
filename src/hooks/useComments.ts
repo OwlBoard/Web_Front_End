@@ -171,9 +171,27 @@ export const useComments = ({ dashboardId, userId }: UseCommentsProps) => {
   }, [comments]);
 
   // 🔹 Mover comentario (drag)
-  const updateCommentPosition = useCallback((id: string, x: number, y: number) => {
+  const updateCommentPosition = useCallback(async (id: string, x: number, y: number) => {
+    // Update local state immediately for smooth UX
     setComments((prev) => prev.map((c) => (c.id === id ? { ...c, x, y } : c)));
-  }, []);
+    
+    // Find comment to get backendId
+    const comment = comments.find(c => c.id === id);
+    if (!comment || !comment.backendId) {
+      console.warn('[useComments] Cannot update position: comment not found or no backendId');
+      return;
+    }
+    
+    try {
+      // Persist to backend
+      await CommentsApiService.updateCommentCoordinates(comment.backendId, x, y);
+      console.log('[useComments] Comment position updated on backend');
+      // Backend will broadcast the update via WebSocket to other clients
+    } catch (error) {
+      console.error('[useComments] Failed to update comment position:', error);
+      // Optionally revert local state on error
+    }
+  }, [comments]);
 
   useEffect(() => {
     loadComments();

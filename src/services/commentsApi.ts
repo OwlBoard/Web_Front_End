@@ -136,6 +136,29 @@ export class CommentsApiService {
     return result;
   }
 
+  // Actualizar solo las coordenadas de un comentario
+  static async updateCommentCoordinates(commentId: string, x: number, y: number): Promise<CommentResponse> {
+    console.log('Updating comment coordinates:', commentId, { x, y });
+    
+    const response = await fetch(`${API_BASE_URL}/${commentId}/coordinates`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify([x, y]),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(`Error updating comment coordinates: ${response.status} - ${errorData.detail || response.statusText}`);
+    }
+
+    const result = await response.json();
+    console.log('Comment coordinates updated:', result);
+    return result;
+  }
+
   // Eliminar un comentario
   static async deleteComment(commentId: string): Promise<void> {
     console.log('Deleting comment:', commentId);
