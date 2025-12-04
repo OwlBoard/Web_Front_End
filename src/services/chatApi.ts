@@ -89,7 +89,8 @@ class ChatApiService {
 
     // Use ws:// for WebSocket connection through API Gateway
     const protocol = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsHost = process.env.NEXT_PUBLIC_API_URL?.replace('http://', '').replace('https://', '').split('/')[0] || 'localhost:8000';
+    // Always use window.location.host since the frontend is served from the same origin
+    const wsHost = typeof window !== 'undefined' ? window.location.host : 'localhost:8000';
     const wsUrl = `${protocol}//${wsHost}/api/chat/ws/${dashboardId}?user_id=${userId}&username=${encodeURIComponent(username)}`;
     this.ws = new WebSocket(wsUrl);
 
