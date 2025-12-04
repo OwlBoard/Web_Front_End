@@ -79,8 +79,8 @@ export function useChatWebSocket({
 
     const connectWebSocket = () => {
       try {
-        // Use ws:// for WebSocket connection through API Gateway
-        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        // Force wss:// since load balancer uses HTTPS (port 8000)
+        const protocol = 'wss:';
         const wsHost = process.env.NEXT_PUBLIC_API_URL?.replace('http://', '').replace('https://', '').split('/')[0] || 'localhost:8000';
         const wsUrl = `${protocol}//${wsHost}/api/chat/ws/${dashboardId}?user_id=${userId}&username=${encodeURIComponent(username)}`;
         

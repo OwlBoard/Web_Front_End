@@ -32,8 +32,8 @@ export const useCommentsWebSocket = ({
     // Get MongoDB ObjectId for the dashboard
     const dashboardMongoId = getDashboardMongoId(dashboardId);
     
-    // Connect to Comments Service WebSocket through API Gateway
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    // Force wss:// since load balancer uses HTTPS (port 8000)
+    const protocol = 'wss:';
     const wsHost = process.env.NEXT_PUBLIC_API_URL?.replace('http://', '').replace('https://', '').split('/')[0] || 'localhost:8000';
     const wsUrl = `${protocol}//${wsHost}/api/comments/ws/dashboards/${dashboardMongoId}/comments`;
     
