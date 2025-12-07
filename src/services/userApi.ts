@@ -2,15 +2,17 @@
 import axios from 'axios';
 import { AuthResponse } from '../types/AuthResponse';
 
-// ✅ Base URL for User Service - matches your FastAPI backend at port 5000
+// ✅ Base URL for User Service - Use API Gateway for proper CORS handling
 const USER_API_BASE_URL =
-  process.env.REACT_APP_USER_SERVICE_URL || 'http://localhost:5000';
+  process.env.NEXT_PUBLIC_API_URL || 
+  process.env.REACT_APP_USER_SERVICE_URL || 
+  'http://localhost:8000/api';
 
 // Configure axios instance
 const userApiClient = axios.create({
   baseURL: USER_API_BASE_URL,
   headers: {
-    'Content-Type': 'application/x-www-form-urlencoded',
+    'Content-Type': 'application/json', // Changed from x-www-form-urlencoded to JSON
   },
   timeout: 10000,
 });
@@ -48,26 +50,22 @@ export interface UserUpdateRequest {
 
 // API Service Class
 export class UserApiService {
-  // ✅ User Registration
+  // ✅ User Registration (JSON)
   static async register(userData: RegisterRequest): Promise<AuthResponse> {
-    const formData = new URLSearchParams();
-    formData.append('email', userData.email);
-    formData.append('password', userData.password);
-    if (userData.full_name) {
-      formData.append('full_name', userData.full_name);
-    }
-
-    const response = await userApiClient.post<AuthResponse>('users/register', formData);
+    const response = await userApiClient.post<AuthResponse>('users/register', {
+      email: userData.email,
+      password: userData.password,
+      full_name: userData.full_name || 'Usuario',
+    });
     return response.data;
   }
 
-  // ✅ User Login (Form fields)
+  // ✅ User Login (JSON)
   static async login(credentials: LoginRequest): Promise<AuthResponse> {
-    const formData = new URLSearchParams();
-    formData.append('email', credentials.email);
-    formData.append('password', credentials.password);
-
-    const response = await userApiClient.post<AuthResponse>('users/login', formData);
+    const response = await userApiClient.post<AuthResponse>('users/login', {
+      email: credentials.email,
+      password: credentials.password,
+    });
     return response.data;
   }
 

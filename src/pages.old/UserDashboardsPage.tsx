@@ -39,7 +39,7 @@ const DashboardsPage = () => {
       try {
         // Fetch user info to get the owner's name
         try {
-          const userResponse = await fetch(`http://localhost:5000/users/${routeUserId}`);
+          const userResponse = await fetch(`http://localhost:8000/api/users/${routeUserId}`);
           if (userResponse.ok) {
             const contentType = userResponse.headers.get("content-type");
             if (contentType && contentType.includes("application/json")) {
@@ -54,7 +54,7 @@ const DashboardsPage = () => {
         }
 
         // Fetch dashboards
-        const response = await fetch(`http://localhost:5000/users/${routeUserId}/dashboards`);
+        const response = await fetch(`http://localhost:8000/api/users/${routeUserId}/dashboards`);
         if (!response.ok) throw new Error("Error al cargar los dashboards");
         const data = await response.json();
 

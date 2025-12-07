@@ -23,7 +23,10 @@ export interface ConnectedUser {
   connected_at: string;
 }
 
-const CHAT_API_BASE = 'http://localhost:8002';
+// Use API Gateway for client-side requests
+const CHAT_API_BASE = process.env.NEXT_PUBLIC_API_URL || 
+                      process.env.REACT_APP_CHAT_SERVICE_URL || 
+                      'http://localhost:8000/api';
 
 class ChatApiService {
   private ws: WebSocket | null = null;
@@ -84,7 +87,11 @@ class ChatApiService {
       this.ws.close();
     }
 
-    const wsUrl = `ws://localhost:8002/chat/ws/${dashboardId}?user_id=${userId}&username=${encodeURIComponent(username)}`;
+    // Use ws:// for WebSocket connection through API Gateway
+    const protocol = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    // Always use window.location.host since the frontend is served from the same origin
+    const wsHost = typeof window !== 'undefined' ? window.location.host : 'localhost:8000';
+    const wsUrl = `${protocol}//${wsHost}/api/chat/ws/${dashboardId}?user_id=${userId}&username=${encodeURIComponent(username)}`;
     this.ws = new WebSocket(wsUrl);
 
     this.ws.onopen = () => {

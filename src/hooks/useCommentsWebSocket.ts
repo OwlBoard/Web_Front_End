@@ -32,8 +32,10 @@ export const useCommentsWebSocket = ({
     // Get MongoDB ObjectId for the dashboard
     const dashboardMongoId = getDashboardMongoId(dashboardId);
     
-    // Connect to Comments Service WebSocket
-    const wsUrl = `ws://localhost:8001/comments/ws/dashboards/${dashboardMongoId}/comments`;
+    // Connect to Comments Service WebSocket through API Gateway
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsHost = process.env.NEXT_PUBLIC_API_URL?.replace('http://', '').replace('https://', '').split('/')[0] || 'localhost:8000';
+    const wsUrl = `${protocol}//${wsHost}/api/comments/ws/dashboards/${dashboardMongoId}/comments`;
     
     console.log('[Comments WS] Connecting to:', wsUrl);
     
