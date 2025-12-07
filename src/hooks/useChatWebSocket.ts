@@ -1,6 +1,11 @@
 // WebSocket hook for real-time chat
 import { useState, useEffect, useRef, useCallback } from 'react';
 
+// Get API base URL from environment - Use API Gateway
+const CHAT_API_BASE = process.env.NEXT_PUBLIC_API_URL ||
+                      process.env.REACT_APP_CHAT_SERVICE_URL || 
+                      'http://localhost:8000/api';
+
 interface ChatMessage {
   id: string;
   user_id: string;
@@ -44,9 +49,7 @@ export function useChatWebSocket({
 
     const loadHistory = async () => {
       try {
-        const apiProtocol = window.location.protocol === 'https:' ? 'https:' : 'http:';
-        const apiBase = `${apiProtocol}//localhost:8000/api`;
-        const response = await fetch(`${apiBase}/chat/messages/${dashboardId}?limit=50`);
+        const response = await fetch(`${CHAT_API_BASE}/chat/messages/${dashboardId}?limit=50`);
         if (response.ok) {
           const data = await response.json();
           // Map backend messages (with 'content') to frontend format (with 'message')
@@ -76,9 +79,11 @@ export function useChatWebSocket({
 
     const connectWebSocket = () => {
       try {
-        // Determine WebSocket URL (ws:// for http://, wss:// for https://)
+        // Use ws:// for WebSocket connection through API Gateway
         const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const wsUrl = `${protocol}//localhost:8000/api/chat/ws/${dashboardId}?user_id=${userId}&username=${encodeURIComponent(username)}`;
+        // Always use window.location.host since the frontend is served from the same origin
+        const wsHost = window.location.host;
+        const wsUrl = `${protocol}//${wsHost}/api/chat/ws/${dashboardId}?user_id=${userId}&username=${encodeURIComponent(username)}`;
         
         console.log('Connecting to WebSocket:', wsUrl);
         const ws = new WebSocket(wsUrl);
@@ -203,9 +208,7 @@ export function useChatWebSocket({
 
     const fetchConnectedUsers = async () => {
       try {
-        const apiProtocol = window.location.protocol === 'https:' ? 'https:' : 'http:';
-        const apiBase = `${apiProtocol}//localhost:8000/api`;
-        const response = await fetch(`${apiBase}/chat/users/${dashboardId}`);
+        const response = await fetch(`${CHAT_API_BASE}/chat/users/${dashboardId}`);
         if (response.ok) {
           const data = await response.json();
           setConnectedUsers(data.users || []);

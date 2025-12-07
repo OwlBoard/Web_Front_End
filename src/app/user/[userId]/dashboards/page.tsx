@@ -42,8 +42,9 @@ export default function UserDashboardsPage() {
 
       try {
         // Fetch user info to get the owner's name
+        const apiUrl = process.env.NEXT_PUBLIC_USER_SERVICE_URL || 'http://localhost:8000/api/users';
         try {
-          const userResponse = await fetch(`http://localhost:8000/api/users/${routeUserId}`);
+          const userResponse = await fetch(`${apiUrl}/${routeUserId}`);
           if (userResponse.ok) {
             const contentType = userResponse.headers.get('content-type');
             if (contentType && contentType.includes('application/json')) {
@@ -57,7 +58,7 @@ export default function UserDashboardsPage() {
         }
 
         // Fetch dashboards
-        const response = await fetch(`http://localhost:8000/api/users/${routeUserId}/dashboards`);
+        const response = await fetch(`${apiUrl}/${routeUserId}/dashboards`);
         if (!response.ok) throw new Error('Error al cargar los dashboards');
         const data = await response.json();
 
@@ -81,8 +82,9 @@ export default function UserDashboardsPage() {
     }
 
     setCreating(true);
+    const apiUrl = process.env.NEXT_PUBLIC_USER_SERVICE_URL || 'http://localhost:8000/api/users';
     try {
-      const response = await fetch(`http://localhost:8000/api/users/${routeUserId}/dashboards`, {
+      const response = await fetch(`${apiUrl}/${routeUserId}/dashboards`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

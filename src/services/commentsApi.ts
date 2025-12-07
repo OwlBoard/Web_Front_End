@@ -2,7 +2,10 @@
 import { CommentDef } from '../types/types';
 import { getUserMongoId, generateMongoIdFromUserId, getDashboardMongoId } from '../utils/UserMongoId';
 
-const API_BASE_URL = 'http://localhost:8000/api/comments';
+const API_BASE_URL = 
+  process.env.NEXT_PUBLIC_COMMENTS_SERVICE_URL || 
+  process.env.REACT_APP_COMMENTS_SERVICE_URL || 
+  'http://localhost:8000/api/comments';
 
 export interface CreateCommentRequest {
   content: string;
@@ -130,6 +133,29 @@ export class CommentsApiService {
 
     const result = await response.json();
     console.log('Comment updated:', result);
+    return result;
+  }
+
+  // Actualizar solo las coordenadas de un comentario
+  static async updateCommentCoordinates(commentId: string, x: number, y: number): Promise<CommentResponse> {
+    console.log('Updating comment coordinates:', commentId, { x, y });
+    
+    const response = await fetch(`${API_BASE_URL}/${commentId}/coordinates`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify([x, y]),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(`Error updating comment coordinates: ${response.status} - ${errorData.detail || response.statusText}`);
+    }
+
+    const result = await response.json();
+    console.log('Comment coordinates updated:', result);
     return result;
   }
 

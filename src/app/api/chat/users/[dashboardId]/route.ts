@@ -1,7 +1,8 @@
 // API route for connected users in a chat room
 import { NextRequest, NextResponse } from 'next/server';
 
-const CHAT_API_URL = process.env.CHAT_SERVICE_URL || 'http://localhost:8002';
+// Use the API gateway for server-side requests (set via docker-compose environment)
+const CHAT_API_URL = process.env.CHAT_SERVICE_URL || 'https://api_gateway/api';
 
 export async function GET(
   request: NextRequest,
