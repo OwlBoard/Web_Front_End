@@ -258,7 +258,8 @@ export function useChatWebSocket({
       wsRef.current.send(JSON.stringify({
         type: 'chat_message',
         data: {
-          message: message.trim()
+          content: message.trim(),
+          message_type: 'text'
         }
       }));
       return true;
